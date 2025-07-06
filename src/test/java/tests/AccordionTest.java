@@ -6,12 +6,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.*;
 
-import java.time.Duration;
 import java.util.*;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class AccordionTest {
@@ -19,6 +18,18 @@ public class AccordionTest {
     private static WebDriver driver;
 
     private final int questionIndex;
+
+    // Массив с ожидаемыми ответами
+    private static final String[] EXPECTED_ANSWERS = {
+            "Сутки — 400 рублей. Оплата курьеру — наличными или картой.",
+            "Пока что у нас так: один заказ — один самокат. Если хотите покататься с друзьями, можете просто сделать несколько заказов — один за другим.",
+            "Допустим, вы оформляете заказ на 8 мая. Мы привозим самокат 8 мая в течение дня. Отсчёт времени аренды начинается с момента, когда вы оплатите заказ курьеру. Если мы привезли самокат 8 мая в 20:30, суточная аренда закончится 9 мая в 20:30.",
+            "Только начиная с завтрашнего дня. Но скоро станем расторопнее.",
+            "Пока что нет! Но если что-то срочное — всегда можно позвонить в поддержку по красивому номеру 1010.",
+            "Самокат приезжает к вам с полной зарядкой. Этого хватает на восемь суток — даже если будете кататься без передышек и во сне. Зарядка не понадобится.",
+            "Да, пока самокат не привезли. Штрафа не будет, объяснительной записки тоже не попросим. Все же свои.",
+            "Да, обязательно. Всем самокатов! И Москве, и Московской области."
+    };
 
     public AccordionTest(int questionIndex) {
         this.questionIndex = questionIndex;
@@ -35,7 +46,7 @@ public class AccordionTest {
     public static void setUpClass() {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.get("https://qa-scooter.praktikum-services.ru/");
+        driver.get(MainPage.PAGE_URL);
     }
 
     @AfterClass
@@ -46,20 +57,18 @@ public class AccordionTest {
     }
 
     @Test
-    public void faqQuestionShouldExpandOnClick() {
+    public void faqQuestionShouldExpandOnClickTest() {
 
-        By questionLocator = new MainPage().faqQuestionByIndex(questionIndex);
-        By answerLocator = new MainPage().faqAnswerByIndex(questionIndex);
+    MainPage mainPage = new MainPage(driver);
+    mainPage.clickQuestion(questionIndex);
 
-        WebElement question = driver.findElement(questionLocator);
+        assertTrue("Ответ не отображается для вопроса №" + questionIndex,
+                mainPage.isAnswerVisible(questionIndex));
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", question);
-        question.click();
+        String actualAnswer = mainPage.getAnswerText(questionIndex);
+        String expectedAnswer = EXPECTED_ANSWERS[questionIndex];
 
-        new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.visibilityOfElementLocated(answerLocator));
+        assertEquals("Ответ для вопроса №" + questionIndex + " некорректен", expectedAnswer, actualAnswer);
 
-        WebElement answer = driver.findElement(answerLocator);
-        assertTrue("Ответ не отображается для вопроса №" + questionIndex, answer.isDisplayed());
     }
 }

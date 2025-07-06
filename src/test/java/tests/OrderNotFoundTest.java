@@ -1,7 +1,11 @@
 package tests;
 
-import org.junit.*;
-import org.openqa.selenium.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -10,17 +14,19 @@ import pageobject.TrackPage;
 
 import java.time.Duration;
 
-import static org.junit.Assert.assertTrue;
-
 public class OrderNotFoundTest {
 
     private WebDriver driver;
+    private MainPage mainPage;
+    private TrackPage trackPage;
 
     @Before
     public void setUp() {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.get("https://qa-scooter.praktikum-services.ru/");
+        mainPage = new MainPage(driver);
+        trackPage = new TrackPage(driver);
+        driver.get(MainPage.PAGE_URL);
     }
 
     @After
@@ -31,25 +37,21 @@ public class OrderNotFoundTest {
     }
 
     @Test
-    public void shouldShowNotFoundMessageForInvalidOrderNumber() {
+    public void shouldShowNotFoundMessageForInvalidOrderNumberTest() {
 
-        // Кликаем "Статус заказа"
-        driver.findElement(MainPage.statusBottom).click();
+        mainPage.clickStatusButton();
 
-        By inputLocator = By.xpath("//input[@placeholder='Введите номер заказа']");
+        // Ждём, что поле ввода станет кликабельным
         new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.elementToBeClickable(inputLocator));
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder='Введите номер заказа']")));
 
-        // Вводим несуществующий номер
-        driver.findElement(TrackPage.orderNumberInput).sendKeys("000000");
+        trackPage.enterOrderNumber("000000");
+        trackPage.clickSearchButton();
 
-        // Кликаем на кнопку поиска
-        driver.findElement(TrackPage.searchButton).click();
-
-        // Проверяем сообщение об ошибке
+        // Проверка сообщения
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement message = wait.until(ExpectedConditions.visibilityOfElementLocated(TrackPage.notFoundMessage));
-        assertTrue("Сообщение об ошибке не отображается", message.isDisplayed());
-    }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("Track_NotFound__6oaoY")));
 
+        Assert.assertTrue("Сообщение об ошибке не отображается", trackPage.isNotFoundMessageDisplayed());
+    }
 }

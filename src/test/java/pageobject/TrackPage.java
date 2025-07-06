@@ -1,15 +1,30 @@
 package pageobject;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
 public class TrackPage {
 
-    // Поле ввода номера заказа
-    public static final By orderNumberInput = By.xpath("//input[@placeholder='Введите номер заказа']");
+    private WebDriver driver;
 
-    // Кнопка поиска (лупа)
-    public static final By searchButton = By.className("Header_Button__28dPO");
+    public TrackPage(WebDriver driver) {
+        this.driver = driver;
+    }
 
-    // Сообщение "Заказ не найден"
-    public static final By notFoundMessage = By.className("Track_NotFound__6oaoY");
+    private final By orderNumberInput = By.xpath("//input[@placeholder='Введите номер заказа']");
+    private final By searchButton = By.className("Header_Button__28dPO");
+    private final By notFoundMessage = By.className("Track_NotFound__6oaoY");
+
+    public void enterOrderNumber(String orderNumber) {
+        driver.findElement(orderNumberInput).sendKeys(orderNumber);
+    }
+
+    public void clickSearchButton() {
+        driver.findElement(searchButton).click();
+    }
+
+    public boolean isNotFoundMessageDisplayed() {
+        return driver.findElement(notFoundMessage).isDisplayed();
+    }
+
 }

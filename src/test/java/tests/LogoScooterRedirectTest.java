@@ -15,7 +15,7 @@ public class LogoScooterRedirectTest {
     public void setUp() {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.get("https://qa-scooter.praktikum-services.ru/");
+        driver.get(MainPage.PAGE_URL);
     }
 
     @After
@@ -27,28 +27,26 @@ public class LogoScooterRedirectTest {
 
     // Доп.Тест 1
     @Test
-    public void clickScooterLogoReturnsToMainPage() {
+    public void clickScooterLogoReturnsToMainPageTest() {
+        MainPage mainPage = new MainPage(driver);
 
-        // Кликаем на логотип Самоката
-        driver.findElement(MainPage.scooterLogo).click();
+        mainPage.clickScooterLogo();
 
-        // Проверка: URL остался https://qa-scooter.praktikum-services.ru/
         String currentUrl = driver.getCurrentUrl();
-        assertTrue("Не перешёл на главную", currentUrl.equals("https://qa-scooter.praktikum-services.ru/"));
+        assertTrue("Не перешёл на главную", currentUrl.equals(MainPage.PAGE_URL));
     }
 
     // Доп.Тест 2
     @Test
-    public void yandexLogoOpensYandexPage() {
-        // Кликаем по логотипу Яндекса
-        driver.findElement(MainPage.yandexLogo).click();
+    public void yandexLogoOpensYandexPageTest() {
+        MainPage mainPage = new MainPage(driver);
 
-        // Переключаемся на вторую вкладку (их станет две)
+        mainPage.clickYandexLogo();
+
         for (String windowHandle : driver.getWindowHandles()) {
             driver.switchTo().window(windowHandle);
         }
 
-        // Проверяем URL новой вкладки
         String url = driver.getCurrentUrl();
         assertTrue("Не открылся сайт Яндекса", url.contains("yandex"));
     }

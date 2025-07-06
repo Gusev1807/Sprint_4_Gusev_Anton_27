@@ -16,7 +16,7 @@ public class OrderFormValidationTest {
     public void setUp() {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.get("https://qa-scooter.praktikum-services.ru/");
+        driver.get(MainPage.PAGE_URL);
     }
 
     @After
@@ -27,23 +27,24 @@ public class OrderFormValidationTest {
     }
 
     @Test
-    public void showErrorClassWhenFieldsAreEmpty() {
+    public void showErrorClassWhenFieldsAreEmptyTest() {
+        MainPage mainPage = new MainPage(driver);
+        OrderPage orderPage = new OrderPage(driver);
 
         // Переход на форму заказа
-        driver.findElement(MainPage.orderTopButton).click();
+        mainPage.clickTopOrderButton();
 
         // Нажать "Далее" без заполнения полей
-        driver.findElement(OrderPage.nextButton).click();
+        orderPage.clickNextButton();
 
         // Проверяем ошибки для каждого поля
         assertTrue("Поле 'Имя' не подсвечено как ошибка",
-                driver.findElement(OrderPage.firstNameInput).getAttribute("class").contains("Input_Error__"));
+                orderPage.getFirstNameInputClass().contains("Input_Error__"));
         assertTrue("Поле 'Фамилия' не подсвечено как ошибка",
-                driver.findElement(OrderPage.lastNameInput).getAttribute("class").contains("Input_Error__"));
+                orderPage.getLastNameInputClass().contains("Input_Error__"));
         assertTrue("Поле 'Адрес' не подсвечено как ошибка",
-                driver.findElement(OrderPage.addressInput).getAttribute("class").contains("Input_Error__"));
+                orderPage.getAddressInputClass().contains("Input_Error__"));
         assertTrue("Поле 'Телефон' не подсвечено как ошибка",
-                driver.findElement(OrderPage.phoneInput).getAttribute("class").contains("Input_Error__"));
-
+                orderPage.getPhoneInputClass().contains("Input_Error__"));
     }
 }
